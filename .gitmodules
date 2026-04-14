@@ -1,0 +1,3 @@
+[submodule "f1tenth_gym"]
+	path = f1tenth_gym
+	url = git@github.com:ocinnitram/f1tenth_gym.git
