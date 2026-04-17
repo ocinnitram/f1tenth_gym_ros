@@ -16,6 +16,8 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.xacro')),
         (os.path.join('share', package_name, 'launch'), glob('launch/*.rviz')),
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        (os.path.join('share', package_name, 'config', 'foxglove'), glob('config/foxglove/*.json')),
+        (os.path.join('share', package_name, 'maps'), glob('maps/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,

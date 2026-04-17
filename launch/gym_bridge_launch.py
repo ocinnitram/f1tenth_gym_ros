@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from launch import LaunchDescription
+from launch.actions import LogInfo
 from launch_ros.actions import Node
 from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
@@ -38,11 +39,17 @@ def generate_launch_description():
     has_opp = config_dict['bridge']['ros__parameters']['num_agent'] > 1
     teleop = config_dict['bridge']['ros__parameters']['kb_teleop']
 
+    map_path = config_dict['bridge']['ros__parameters']['map_path']
+    if not os.path.isabs(map_path):
+        map_path = os.path.join(
+            get_package_share_directory('roboracer_data'), 'maps', map_path
+        )
+
     bridge_node = Node(
         package='f1tenth_gym_ros',
         executable='gym_bridge',
         name='bridge',
-        parameters=[config]
+        parameters=[config, {'map_path': map_path}]
     )
     rviz_node = Node(
         package='rviz2',
@@ -50,10 +57,20 @@ def generate_launch_description():
         name='rviz',
         arguments=['-d', os.path.join(get_package_share_directory('f1tenth_gym_ros'), 'launch', 'gym_bridge.rviz')]
     )
+    foxglove_bridge_node = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        parameters=[{'port': 8765, 'address': '0.0.0.0', 'send_buffer_limit': 10000000}]
+    )
+    foxglove_layout_path = os.path.join(
+        get_package_share_directory('f1tenth_gym_ros'),
+        'config', 'foxglove', 'gym_bridge_foxglove.json'
+    )
     map_server_node = Node(
         package='nav2_map_server',
         executable='map_server',
-        parameters=[{'yaml_filename': config_dict['bridge']['ros__parameters']['map_path'] + '.yaml'},
+        parameters=[{'yaml_filename': map_path + '.yaml'},
                     {'topic': 'map'},
                     {'frame_id': 'map'},
                     {'output': 'screen'},
@@ -84,7 +101,10 @@ def generate_launch_description():
     )
 
     # finalize
-    ld.add_action(rviz_node)
+    ld.add_action(LogInfo(msg=['Foxglove WebSocket: ws://localhost:8765']))
+    ld.add_action(LogInfo(msg=['Foxglove layout file: ' + foxglove_layout_path]))
+    ld.add_action(foxglove_bridge_node)
+    # ld.add_action(rviz_node)  # use Foxglove instead; uncomment to re-enable RViz
     ld.add_action(bridge_node)
     ld.add_action(nav_lifecycle_node)
     ld.add_action(map_server_node)

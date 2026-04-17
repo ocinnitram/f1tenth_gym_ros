@@ -129,3 +129,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# nested pip-editable gym (installed locally, not part of this repo)
+f1tenth_gym/

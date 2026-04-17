@@ -39,10 +39,11 @@ bridge:
     
     # laserscan parameters
     scan_fov: 4.7
-    scan_beams: 1080
+    scan_beams: 811
 
     # map parameters
-    map_path: '/sim_ws/src/f1tenth_gym_ros/maps/levine'
+    # Relative: resolved from roboracer_data/maps/ in launch file (absolute paths pass through).
+    map_path: 'aut/aut'
     map_img_ext: '.png'
 
     # opponent parameters
