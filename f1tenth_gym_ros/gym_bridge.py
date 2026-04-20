@@ -126,10 +126,11 @@ class GymBridge(Node):
             self.obs, _ , self.done, _ = self.env.reset(np.array([[sx, sy, stheta]]))
             self.ego_scan = list(self.obs['scans'][0])
 
-        # sim physical step timer
+        # sim physical step timer — keep fast so dynamics stay smooth
         self.drive_timer = self.create_timer(0.01, self.drive_timer_callback)
-        # topic publishing timer
-        self.timer = self.create_timer(0.004, self.timer_callback)
+        # sensor publish timers — match real-car rates (Sick LiDAR 15Hz, VESC odom 50Hz)
+        self.scan_timer = self.create_timer(1.0 / 15.0, self.scan_timer_callback)
+        self.odom_timer = self.create_timer(1.0 / 50.0, self.odom_timer_callback)
 
         # transform broadcaster
         self.br = TransformBroadcaster(self)
@@ -233,10 +234,9 @@ class GymBridge(Node):
             self.obs, _, self.done, _ = self.env.step(np.array([[self.ego_steer, self.ego_requested_speed], [self.opp_steer, self.opp_requested_speed]]))
         self._update_sim_state()
 
-    def timer_callback(self):
+    def scan_timer_callback(self):
         ts = self.get_clock().now().to_msg()
 
-        # pub scans
         scan = LaserScan()
         scan.header.stamp = ts
         scan.header.frame_id = self.ego_namespace + '/laser'
@@ -260,7 +260,8 @@ class GymBridge(Node):
             opp_scan.ranges = self.opp_scan
             self.opp_scan_pub.publish(opp_scan)
 
-        # pub tf
+    def odom_timer_callback(self):
+        ts = self.get_clock().now().to_msg()
         self._publish_odom(ts)
         self._publish_transforms(ts)
         self._publish_laser_transforms(ts)
