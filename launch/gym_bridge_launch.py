@@ -61,7 +61,8 @@ def generate_launch_description():
         package='foxglove_bridge',
         executable='foxglove_bridge',
         name='foxglove_bridge',
-        parameters=[{'port': 8765, 'address': '0.0.0.0', 'send_buffer_limit': 10000000}]
+        parameters=[{'port': 8765, 'address': '0.0.0.0', 'send_buffer_limit': 10000000,
+                     'num_threads': 4}]
     )
     foxglove_layout_path = os.path.join(
         get_package_share_directory('f1tenth_gym_ros'),

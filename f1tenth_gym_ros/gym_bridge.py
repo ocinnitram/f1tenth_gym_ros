@@ -131,6 +131,8 @@ class GymBridge(Node):
         # sensor publish timers — match real-car rates (Sick LiDAR 15Hz, VESC odom 50Hz)
         self.scan_timer = self.create_timer(1.0 / 15.0, self.scan_timer_callback)
         self.odom_timer = self.create_timer(1.0 / 50.0, self.odom_timer_callback)
+        # TF at 100 Hz — matches physics step so Foxglove position is never stale
+        self.tf_timer = self.create_timer(0.01, self.tf_timer_callback)
 
         # transform broadcaster
         self.br = TransformBroadcaster(self)
@@ -263,6 +265,9 @@ class GymBridge(Node):
     def odom_timer_callback(self):
         ts = self.get_clock().now().to_msg()
         self._publish_odom(ts)
+
+    def tf_timer_callback(self):
+        ts = self.get_clock().now().to_msg()
         self._publish_transforms(ts)
         self._publish_laser_transforms(ts)
         self._publish_wheel_transforms(ts)
