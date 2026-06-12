@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1000" viewBox="0 0 1500 1000" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/>
+    </marker>
+    <marker id="arrRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c0392b"/>
+    </marker>
+    <marker id="arrBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f5fa8"/>
+    </marker>
+    <marker id="arrGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1e8449"/>
+    </marker>
+    <marker id="arrGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="1000" fill="#fdfdfb"/>
+  <text x="40" y="40" font-size="24" font-weight="bold" fill="#222">Dynamic single-track model — Pacejka tires, AWD split, Kamm combined slip (friction_patch.py + actuator_patch.py)</text>
+  <text x="40" y="64" font-size="14" fill="#666">State x = [X, Y, δ, v, ψ, r, β] · blue = velocities · red = tire forces · green = control/actuator chain</text>
+
+  <!-- ================= BICYCLE MODEL (top view) ================= -->
+  <!-- body axis -->
+  <line x1="110" y1="370" x2="790" y2="370" stroke="#bbb" stroke-width="2"/>
+  <line x1="790" y1="370" x2="845" y2="370" stroke="#999" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrGray)"/>
+  <text x="800" y="358" font-size="14" fill="#666">body x (heading ψ)</text>
+
+  <!-- rear wheel -->
+  <rect x="125" y="352" width="80" height="36" rx="8" fill="#2c3e50"/>
+  <!-- front wheel, steered by delta -->
+  <g transform="rotate(-24 680 370)">
+    <rect x="640" y="352" width="80" height="36" rx="8" fill="#2c3e50"/>
+  </g>
+  <!-- wheel heading line (front) -->
+  <line x1="680" y1="370" x2="800" y2="316.6" stroke="#888" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <!-- steering angle delta arc between body x and wheel plane -->
+  <path d="M 745 370 A 65 65 0 0 0 739.4 343.6" fill="none" stroke="#1e8449" stroke-width="2" marker-end="url(#arrGreen)"/>
+  <text x="753" y="352" font-size="17" fill="#1e8449" font-style="italic">δ</text>
+
+  <!-- CoG -->
+  <circle cx="420" cy="370" r="9" fill="#fff" stroke="#222" stroke-width="2.5"/>
+  <line x1="411" y1="370" x2="429" y2="370" stroke="#222" stroke-width="1.5"/>
+  <line x1="420" y1="361" x2="420" y2="379" stroke="#222" stroke-width="1.5"/>
+  <text x="400" y="402" font-size="14" fill="#222" font-weight="bold">CoG (m, I, h)</text>
+
+  <!-- yaw rate arc -->
+  <path d="M 470 340 A 58 58 0 0 1 470 400" fill="none" stroke="#7d3c98" stroke-width="2.2" marker-end="url(#arr)"/>
+  <text x="486" y="375" font-size="16" fill="#7d3c98" font-style="italic">r = ψ̇</text>
+
+  <!-- velocity v at CoG, beta above body x -->
+  <line x1="420" y1="370" x2="588" y2="302" stroke="#1f5fa8" stroke-width="3" marker-end="url(#arrBlue)"/>
+  <text x="560" y="290" font-size="18" fill="#1f5fa8" font-weight="bold" font-style="italic">v</text>
+  <!-- components -->
+  <line x1="420" y1="370" x2="588" y2="370" stroke="#1f5fa8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrBlue)"/>
+  <text x="540" y="390" font-size="15" fill="#1f5fa8" font-style="italic">v_x = v·cos β</text>
+  <line x1="588" y1="370" x2="588" y2="302" stroke="#1f5fa8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrBlue)"/>
+  <text x="596" y="340" font-size="15" fill="#1f5fa8" font-style="italic">v_y = v·sin β</text>
+  <!-- beta arc -->
+  <path d="M 500 370 A 80 80 0 0 0 494 338" fill="none" stroke="#1f5fa8" stroke-width="1.8" marker-end="url(#arrBlue)"/>
+  <text x="508" y="352" font-size="16" fill="#1f5fa8" font-style="italic">β</text>
+
+  <!-- ===== rear axle forces ===== -->
+  <line x1="165" y1="370" x2="165" y2="255" stroke="#c0392b" stroke-width="3" marker-end="url(#arrRed)"/>
+  <text x="120" y="248" font-size="16" fill="#c0392b" font-style="italic" font-weight="bold">F_yr</text>
+  <line x1="165" y1="370" x2="265" y2="370" stroke="#c0392b" stroke-width="3" marker-end="url(#arrRed)"/>
+  <text x="216" y="416" font-size="16" fill="#c0392b" font-style="italic" font-weight="bold">F_xr</text>
+  <!-- rear wheel velocity + slip angle -->
+  <line x1="165" y1="370" x2="285" y2="322" stroke="#1f5fa8" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrBlue)"/>
+  <text x="262" y="312" font-size="13" fill="#1f5fa8">(v_x , v_y − l_r·r)</text>
+  <path d="M 240 370 A 75 75 0 0 0 234 341" fill="none" stroke="#b9770e" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="248" y="355" font-size="15" fill="#b9770e" font-style="italic">α_r</text>
+
+  <!-- ===== front axle forces (wheel frame, rotated by delta) ===== -->
+  <!-- F_yf perpendicular to wheel plane: direction (-sin d, -cos d) in svg = up-left -->
+  <line x1="680" y1="370" x2="633.2" y2="264.9" stroke="#c0392b" stroke-width="3" marker-end="url(#arrRed)"/>
+  <text x="590" y="262" font-size="16" fill="#c0392b" font-style="italic" font-weight="bold">F_yf</text>
+  <!-- F_xf along wheel plane -->
+  <line x1="680" y1="370" x2="771.3" y2="329.4" stroke="#c0392b" stroke-width="3" marker-end="url(#arrRed)"/>
+  <text x="772" y="320" font-size="16" fill="#c0392b" font-style="italic" font-weight="bold">F_xf</text>
+  <!-- front wheel velocity + slip angle -->
+  <line x1="680" y1="370" x2="804" y2="338" stroke="#1f5fa8" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrBlue)"/>
+  <text x="800" y="362" font-size="13" fill="#1f5fa8">(v_x , v_y + l_f·r)</text>
+  <path d="M 770 347.5 A 92 92 0 0 1 772 350.2" fill="none" stroke="#b9770e" stroke-width="0"/>
+  <path d="M 766 331.8 A 95 95 0 0 1 771 346.4" fill="none" stroke="#b9770e" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="780" y="343" font-size="15" fill="#b9770e" font-style="italic">α_f</text>
+
+  <!-- ===== dimensions ===== -->
+  <line x1="165" y1="445" x2="165" y2="475" stroke="#888" stroke-width="1"/>
+  <line x1="420" y1="412" x2="420" y2="475" stroke="#888" stroke-width="1"/>
+  <line x1="680" y1="445" x2="680" y2="475" stroke="#888" stroke-width="1"/>
+  <line x1="165" y1="462" x2="420" y2="462" stroke="#888" stroke-width="1.4" marker-start="url(#arrGray)" marker-end="url(#arrGray)"/>
+  <line x1="420" y1="462" x2="680" y2="462" stroke="#888" stroke-width="1.4" marker-start="url(#arrGray)" marker-end="url(#arrGray)"/>
+  <text x="282" y="455" font-size="15" fill="#555" font-style="italic">l_r</text>
+  <text x="540" y="455" font-size="15" fill="#555" font-style="italic">l_f</text>
+
+  <!-- normal loads note -->
+  <text x="125" y="505" font-size="14" fill="#555">Quasi-static load transfer (a = long. accel demand):</text>
+  <text x="125" y="526" font-size="15" fill="#333" font-style="italic">F_zf = m(g·l_r − a·h)/L ,&#160;&#160; F_zr = m(g·l_f + a·h)/L ,&#160;&#160; L = l_f + l_r</text>
+  <text x="125" y="550" font-size="14" fill="#555">AWD split by normal load:&#160;&#160;<tspan font-style="italic" fill="#333">F_xf = m·a · F_zf /(F_zf + F_zr) ,&#160; F_xr = m·a − F_xf</tspan></text>
+
+  <!-- ================= KAMM CIRCLE INSET ================= -->
+  <text x="125" y="625" font-size="17" font-weight="bold" fill="#222">Per-axle Kamm circle (combined slip)</text>
+  <g transform="translate(240 790)">
+    <circle cx="0" cy="0" r="105" fill="#fbeee6" stroke="#c0392b" stroke-width="2.5"/>
+    <circle cx="0" cy="0" r="87.5" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <line x1="-125" y1="0" x2="125" y2="0" stroke="#ccc" stroke-width="1"/>
+    <line x1="0" y1="125" x2="0" y2="-125" stroke="#ccc" stroke-width="1"/>
+    <text x="112" y="18" font-size="13" fill="#777" font-style="italic">F_x</text>
+    <text x="8" y="-112" font-size="13" fill="#777" font-style="italic">F_y</text>
+    <!-- demanded vector exceeding the circle -->
+    <line x1="0" y1="0" x2="92" y2="-110" stroke="#888" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrGray)"/>
+    <text x="84" y="-118" font-size="13" fill="#777">demand (F_x,i , F_y0,i)</text>
+    <!-- scaled vector on circle -->
+    <line x1="0" y1="0" x2="67.3" y2="-80.5" stroke="#c0392b" stroke-width="3" marker-end="url(#arrRed)"/>
+    <text x="-2" y="-58" font-size="13" fill="#c0392b" font-weight="bold">scaled, direction kept</text>
+    <!-- radius labels -->
+    <line x1="0" y1="0" x2="-74.2" y2="74.2" stroke="#c0392b" stroke-width="1.6"/>
+    <text x="-150" y="98" font-size="14" fill="#c0392b" font-style="italic">R = S·μ·F_z,i (peak)</text>
+    <line x1="0" y1="0" x2="61.9" y2="61.9" stroke="#999" stroke-width="1.4"/>
+    <text x="40" y="95" font-size="13" fill="#777" font-style="italic">μ·F_z,i (slide asymptote)</text>
+  </g>
+  <text x="430" y="730" font-size="14" fill="#444">If ‖(F_x,i , F_y0,i)‖ &gt; S·μ·F_z,i :</text>
+  <text x="430" y="754" font-size="15" fill="#333" font-style="italic">s_i = S·μ·F_z,i / ‖·‖ ,&#160;&#160; (F_x,i , F_y,i) ← s_i·(F_x,i , F_y0,i)</text>
+  <text x="430" y="784" font-size="13" fill="#666">Both components shrink together → trail-braking</text>
+  <text x="430" y="802" font-size="13" fill="#666">trades lateral for longitudinal smoothly; brake</text>
+  <text x="430" y="820" font-size="13" fill="#666">authority never vanishes mid-slide.</text>
+  <text x="430" y="850" font-size="13" fill="#666">S = LAT_PEAK_SCALE = 1.20, μ = 0.42</text>
+  <text x="430" y="868" font-size="13" fill="#666">→ peak 0.50 g, slide level 0.42 g (sys-ID 2026-06-11)</text>
+
+  <!-- ================= PACEJKA CURVE INSET ================= -->
+  <g transform="translate(700 640)">
+    <text x="0" y="-12" font-size="17" font-weight="bold" fill="#222">Pure-slip Pacejka (per axle)</text>
+    <line x1="0" y1="160" x2="330" y2="160" stroke="#444" stroke-width="1.5" marker-end="url(#arrGray)"/>
+    <line x1="0" y1="160" x2="0" y2="10" stroke="#444" stroke-width="1.5" marker-end="url(#arrGray)"/>
+    <text x="318" y="180" font-size="13" fill="#444" font-style="italic">α</text>
+    <text x="-14" y="14" font-size="13" fill="#444" font-style="italic">F_y0</text>
+    <!-- curve: rises to peak at alpha_pk then falls to asymptote -->
+    <path d="M 0 160 C 25 95, 45 48, 80 40 C 110 34, 160 48, 220 56 C 270 62, 300 64, 325 65" fill="none" stroke="#c0392b" stroke-width="2.8"/>
+    <!-- peak marker -->
+    <line x1="80" y1="40" x2="80" y2="160" stroke="#999" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="62" y="178" font-size="13" fill="#555" font-style="italic">α_pk = 0.16</text>
+    <line x1="0" y1="40" x2="80" y2="40" stroke="#999" stroke-width="1" stroke-dasharray="4 4"/>
+    <text x="86" y="30" font-size="13" fill="#c0392b" font-style="italic">D = S·μ·F_z (peak)</text>
+    <!-- asymptote -->
+    <line x1="0" y1="65" x2="330" y2="65" stroke="#999" stroke-width="1" stroke-dasharray="6 5"/>
+    <text x="218" y="86" font-size="13" fill="#777" font-style="italic">μ·F_z (slide)</text>
+    <text x="0" y="215" font-size="15" fill="#333" font-style="italic">F_y0,i = D_i · sin( C · atan( B_i · α_i ) )</text>
+    <text x="0" y="238" font-size="13" fill="#666">C from sin(Cπ/2) = 1/S (≈1.373) · B_r from α_pk · B_f = B_r·C_Sf/C_Sr</text>
+    <!-- relaxation -->
+    <text x="0" y="276" font-size="14" fill="#444" font-weight="bold">Tire relaxation (distance domain):</text>
+    <text x="0" y="299" font-size="15" fill="#333" font-style="italic">τ_F = σ_Fy / max(v_x , 0.5) ,&#160; σ_Fy = 0.03 m</text>
+    <text x="0" y="322" font-size="15" fill="#333" font-style="italic">F_y0 ← F_y0 + min(1, Δt/τ_F)·(F_y0,ss − F_y0)</text>
+    <text x="0" y="343" font-size="13" fill="#666">lagged F_y0 held constant across RK4 substeps; Kamm scaling applied instantaneously</text>
+  </g>
+
+  <!-- ================= ACTUATOR CHAIN (right panel) ================= -->
+  <g transform="translate(880 90)">
+    <rect x="0" y="0" width="580" height="500" rx="12" fill="#eef5ee" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="18" font-weight="bold" fill="#1e8449">Actuator chain (actuator_patch.py: delays + better_pid)</text>
+
+    <!-- steering path -->
+    <text x="20" y="66" font-size="15" font-weight="bold" fill="#333">Steering: δ_cmd → δ</text>
+    <rect x="20" y="80" width="110" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="75" y="100" font-size="13" fill="#333" text-anchor="middle">pure delay</text>
+    <text x="75" y="117" font-size="13" fill="#333" text-anchor="middle" font-style="italic">t_sd</text>
+    <line x1="130" y1="103" x2="158" y2="103" stroke="#1e8449" stroke-width="2" marker-end="url(#arrGreen)"/>
+    <rect x="160" y="80" width="180" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="250" y="99" font-size="12.5" fill="#333" text-anchor="middle">deadband + softening map</text>
+    <text x="250" y="116" font-size="12.5" fill="#333" text-anchor="middle" font-style="italic">δ* = δ_c³/((δ_c²+δ_th²)(1+γδ_c²))</text>
+    <line x1="340" y1="103" x2="368" y2="103" stroke="#1e8449" stroke-width="2" marker-end="url(#arrGreen)"/>
+    <rect x="370" y="80" width="190" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="465" y="99" font-size="12.5" fill="#333" text-anchor="middle">2nd-order servo response</text>
+    <text x="465" y="116" font-size="12.5" fill="#333" text-anchor="middle" font-style="italic">τ_δ , τ_δ̇ → sv ∈ [sv_min, sv_max]</text>
+    <text x="20" y="152" font-size="13" fill="#555" font-style="italic">δ̇_des = (δ* − δ)/τ_δ ;&#160; δ̈ = (δ̇_des − δ̇)/τ_δ̇ ;&#160; sv = δ̇ + Δt·δ̈ (clamped) ;&#160; δ̇ = sv</text>
+
+    <!-- speed path -->
+    <text x="20" y="192" font-size="15" font-weight="bold" fill="#333">Drive: v_cmd → a</text>
+    <rect x="20" y="206" width="110" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="75" y="226" font-size="13" fill="#333" text-anchor="middle">pure delay</text>
+    <text x="75" y="243" font-size="13" fill="#333" text-anchor="middle" font-style="italic">t_vd</text>
+    <line x1="130" y1="229" x2="158" y2="229" stroke="#1e8449" stroke-width="2" marker-end="url(#arrGreen)"/>
+    <rect x="160" y="206" width="180" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="250" y="225" font-size="12.5" fill="#333" text-anchor="middle">P speed loop, saturated</text>
+    <text x="250" y="242" font-size="12.5" fill="#333" text-anchor="middle" font-style="italic">a_des = clip((v_c − v)/τ_v, ±a_max)</text>
+    <line x1="340" y1="229" x2="368" y2="229" stroke="#1e8449" stroke-width="2" marker-end="url(#arrGreen)"/>
+    <rect x="370" y="206" width="190" height="46" rx="6" fill="#fff" stroke="#1e8449" stroke-width="1.5"/>
+    <text x="465" y="225" font-size="12.5" fill="#333" text-anchor="middle">1st-order torque buildup</text>
+    <text x="465" y="242" font-size="12.5" fill="#333" text-anchor="middle" font-style="italic">ȧ = (a_des − a)/τ_a → a (±a_max)</text>
+    <text x="20" y="278" font-size="13" fill="#555">then gym constraints: steering_constraint(δ, sv) and accl_constraints(v, a):</text>
+    <text x="20" y="297" font-size="13" fill="#555" font-style="italic">position/rate limits, power derating a_max·v_switch/v above v_switch, v ∈ [v_min, v_max]</text>
+
+    <!-- inputs to dynamics -->
+    <line x1="290" y1="310" x2="290" y2="338" stroke="#1e8449" stroke-width="2.5" marker-end="url(#arrGreen)"/>
+    <rect x="110" y="340" width="360" height="44" rx="8" fill="#1e8449"/>
+    <text x="290" y="367" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">u = [sv, a] → single-track dynamics (RK4, Δt = 10 ms)</text>
+
+    <!-- wheel speed observable -->
+    <text x="20" y="416" font-size="15" font-weight="bold" fill="#333">Wheel-speed observable (VESC ERPM equivalent)</text>
+    <text x="20" y="438" font-size="13" fill="#555">grip: v_wheel = v_x ;&#160; if transmitted F_x falls &gt;5% short of demand (Kamm-saturated):</text>
+    <text x="20" y="458" font-size="13" fill="#555" font-style="italic">v̇_wheel = (v_cmd,delayed − v_wheel)/τ_v ,&#160; v_wheel ≥ 0</text>
+    <text x="20" y="481" font-size="13" fill="#666">→ over-reads in throttle slip, under-reads in brake slip, like the real wheel odometry</text>
+  </g>
+
+  <!-- ================= LOW SPEED + EOM PANEL ================= -->
+  <g transform="translate(1080 620)">
+    <rect x="0" y="0" width="380 " height="350" rx="12" fill="#f4f0fa" stroke="#7d3c98" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="17" font-weight="bold" fill="#7d3c98">Body-frame force balance</text>
+    <text x="20" y="64" font-size="14.5" fill="#333" font-style="italic">m(v̇_x − v_y r) = F_xf cosδ − F_yf sinδ + F_xr</text>
+    <text x="20" y="90" font-size="14.5" fill="#333" font-style="italic">m(v̇_y + v_x r) = F_xf sinδ + F_yf cosδ + F_yr</text>
+    <text x="20" y="116" font-size="14.5" fill="#333" font-style="italic">I·ṙ = l_f (F_yf cosδ + F_xf sinδ) − l_r F_yr</text>
+    <text x="20" y="148" font-size="13.5" fill="#555">mapped back to gym state (v, β):</text>
+    <text x="20" y="172" font-size="14.5" fill="#333" font-style="italic">v̇ = (v_x v̇_x + v_y v̇_y)/v</text>
+    <text x="20" y="196" font-size="14.5" fill="#333" font-style="italic">β̇ = (v_x v̇_y − v_y v̇_x)/v²</text>
+    <text x="20" y="220" font-size="14.5" fill="#333" font-style="italic">Ẋ = v cos(ψ+β) , Ẏ = v sin(ψ+β) , ψ̇ = r</text>
+    <text x="20" y="258" font-size="15" font-weight="bold" fill="#7d3c98">Low-speed branch (v_x &lt; 0.5 m/s)</text>
+    <text x="20" y="282" font-size="13.5" fill="#555">kinematic single-track (no tire forces), plus</text>
+    <text x="20" y="306" font-size="14.5" fill="#333" font-style="italic">β̇ = −β / τ_β,kin&#160;&#160;&#160;(τ_β,kin = 0.15 s)</text>
+    <text x="20" y="330" font-size="13.5" fill="#555">so a spun car re-aligns instead of freezing at β≈π</text>
+  </g>
+</svg>
