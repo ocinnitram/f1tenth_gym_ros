@@ -21,12 +21,15 @@
 # SOFTWARE.
 
 from launch import LaunchDescription
-from launch.actions import LogInfo
+from launch.actions import LogInfo, ExecuteProcess
 from launch_ros.actions import Node
 from launch.substitutions import Command
 from ament_index_python.packages import get_package_share_directory
 import os
+import subprocess
 import yaml
+
+URDF_TMP_PATH = '/tmp/ego_racecar.urdf'
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -44,6 +47,10 @@ def generate_launch_description():
         map_path = os.path.join(
             get_package_share_directory('roboracer_data'), 'maps', map_path
         )
+
+    # Generate URDF file synchronously so foxglove_bridge can serve it as an asset
+    xacro_path = os.path.join(get_package_share_directory('f1tenth_gym_ros'), 'launch', 'ego_racecar.xacro')
+    subprocess.run(['xacro', xacro_path, '-o', URDF_TMP_PATH], check=True)
 
     bridge_node = Node(
         package='f1tenth_gym_ros',
@@ -63,6 +70,11 @@ def generate_launch_description():
         name='foxglove_bridge',
         parameters=[{'port': 8765, 'address': '0.0.0.0', 'send_buffer_limit': 10000000,
                      'num_threads': 4}]
+    )
+    urdf_http_server = ExecuteProcess(
+        cmd=['python3', '-m', 'http.server', '8888', '--directory', '/tmp'],
+        name='urdf_http_server',
+        output='screen'
     )
     foxglove_layout_path = os.path.join(
         get_package_share_directory('f1tenth_gym_ros'),
@@ -86,13 +98,6 @@ def generate_launch_description():
                     {'autostart': True},
                     {'node_names': ['map_server']}]
     )
-    ego_robot_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='ego_robot_state_publisher',
-        parameters=[{'robot_description': Command(['xacro ', os.path.join(get_package_share_directory('f1tenth_gym_ros'), 'launch', 'ego_racecar.xacro')])}],
-        remappings=[('/robot_description', 'ego_robot_description')]
-    )
     opp_robot_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -103,13 +108,14 @@ def generate_launch_description():
 
     # finalize
     ld.add_action(LogInfo(msg=['Foxglove WebSocket: ws://localhost:8765']))
+    ld.add_action(LogInfo(msg=[f'URDF served at: http://localhost:8888/ego_racecar.urdf — use Source:URL in Foxglove URDF layer']))
+    ld.add_action(urdf_http_server)
     ld.add_action(LogInfo(msg=['Foxglove layout file: ' + foxglove_layout_path]))
     ld.add_action(foxglove_bridge_node)
     # ld.add_action(rviz_node)  # use Foxglove instead; uncomment to re-enable RViz
     ld.add_action(bridge_node)
     ld.add_action(nav_lifecycle_node)
     ld.add_action(map_server_node)
-    ld.add_action(ego_robot_publisher)
     if has_opp:
         ld.add_action(opp_robot_publisher)
 

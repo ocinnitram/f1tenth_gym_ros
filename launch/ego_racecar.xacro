@@ -5,7 +5,9 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="racecar">
 
   <xacro:property name="wheelbase" value="0.3302" />
-  <xacro:property name="width" value="0.2032" />
+  <!-- width / body_length match simulator_params collision footprint, not the original 0.2032 / wheelbase stock values -->
+  <xacro:property name="width" value="0.29" />
+  <xacro:property name="body_length" value="0.5" />
   <xacro:property name="height" value="0.1" />
   <xacro:property name="ground_offset" value="0.04" />
   <xacro:property name="wheel_radius" value="0.0508" />
@@ -23,23 +25,23 @@
     <color rgba="0.3 0.57 1. 1."/>
   </material>
 
-  <link name="${car_name}/base_link">
+  <link name="base_link">
     <visual>
       <origin xyz="${wheelbase/2} 0 ${ground_offset+height/2}"/>
       <geometry>
-        <box size="${wheelbase} ${width} ${height}"/>
+        <box size="${body_length} ${width} ${height}"/>
       </geometry>
       <material name="blue"/>
     </visual>
   </link>
 
-  <joint name="base_to_laser_model" type="fixed">
-    <parent link="${car_name}/base_link"/>
-    <child link="${car_name}/laser_model"/>
+  <joint name="base_to_laser" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
     <origin xyz="${laser_distance_from_base_link} 0 ${ground_offset+height+(laser_height/2)}"/>
   </joint>
 
-  <link name="${car_name}/laser_model">
+  <link name="laser">
     <visual>
       <geometry>
         <cylinder radius="${laser_radius}" length="${laser_height}"/>
@@ -49,12 +51,12 @@
   </link>
 
   <joint name="$base_to_back_left_wheel" type="fixed">
-    <parent link="${car_name}/base_link"/>
-    <child link="${car_name}/back_left_wheel"/>
+    <parent link="base_link"/>
+    <child link="back_left_wheel"/>
     <origin xyz="0 ${(wheel_length+width)/2} ${wheel_radius}"/>
   </joint>
 
-  <link name="${car_name}/back_left_wheel">
+  <link name="back_left_wheel">
     <visual>
       <geometry>
         <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
@@ -65,12 +67,12 @@
   </link>
 
   <joint name="base_to_back_right_wheel" type="fixed">
-    <parent link="${car_name}/base_link"/>
-    <child link="${car_name}/back_right_wheel"/>
+    <parent link="base_link"/>
+    <child link="back_right_wheel"/>
     <origin xyz="0 ${-(wheel_length+width)/2} ${wheel_radius}"/>
   </joint>
 
-  <link name="${car_name}/back_right_wheel">
+  <link name="back_right_wheel">
     <visual>
       <geometry>
         <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
@@ -81,19 +83,19 @@
   </link>
 
   <joint name="base_to_front_left_hinge" type="fixed">
-    <parent link="${car_name}/base_link"/>
-    <child link="${car_name}/front_left_hinge"/>
+    <parent link="base_link"/>
+    <child link="front_left_hinge"/>
     <origin xyz="${wheelbase} ${(wheel_length+width)/2} ${wheel_radius}"/>
   </joint>
 
-  <link name="${car_name}/front_left_hinge"/>
+  <link name="front_left_hinge"/>
 
   <joint name="front_left_hinge_to_wheel" type="continuous">
-    <parent link="${car_name}/front_left_hinge"/>
-    <child link="${car_name}/front_left_wheel"/>
+    <parent link="front_left_hinge"/>
+    <child link="front_left_wheel"/>
   </joint>
 
-  <link name="${car_name}/front_left_wheel">
+  <link name="front_left_wheel">
     <visual>
       <geometry>
         <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
@@ -104,19 +106,19 @@
   </link>
 
   <joint name="base_to_front_right_hinge" type="fixed">
-    <parent link="${car_name}/base_link"/>
-    <child link="${car_name}/front_right_hinge"/>
+    <parent link="base_link"/>
+    <child link="front_right_hinge"/>
     <origin xyz="${wheelbase} ${-(wheel_length+width)/2} ${wheel_radius}"/>
   </joint>
 
-  <link name="${car_name}/front_right_hinge"/>
+  <link name="front_right_hinge"/>
 
   <joint name="front_right_hinge_to_wheel" type="continuous">
-    <parent link="${car_name}/front_right_hinge"/>
-    <child link="${car_name}/front_right_wheel"/>
+    <parent link="front_right_hinge"/>
+    <child link="front_right_wheel"/>
   </joint>
 
-  <link name="${car_name}/front_right_wheel">
+  <link name="front_right_wheel">
     <visual>
       <geometry>
         <cylinder radius="${wheel_radius}" length="${wheel_length}"/>
